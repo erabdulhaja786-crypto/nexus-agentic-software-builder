@@ -1,3 +1,4 @@
+import zipfile
 import contextlib
 import io
 import os
@@ -671,6 +672,31 @@ elif st.session_state.page == "Build Results":
             with st.expander("📁 Explore generated files", expanded=True):
                 for file in files:
                     st.markdown(f"- `{file}`")
+            
+            root = Path(project_path)
+            zip_buffer = io.BytesIO()
+
+            with zipfile.ZipFile(
+                zip_buffer, "w", zipfile.ZIP_DEFLATED
+            ) as zip_file:
+                for relative_path in files:
+                    file_path = root / relative_path
+
+                    if file_path.is_file():
+                        zip_file.write(
+                            file_path,
+                            arcname=f"{root.name}/{relative_path}",
+                        )
+
+            st.download_button(
+                label="⬇️ Download Project ZIP",
+                data=zip_buffer.getvalue(),
+                file_name=f"{root.name}.zip",
+                mime="application/zip",
+                use_container_width=True,
+                key="download_generated_project",
+            )
+
 
             st.markdown("### Run your application")
 
