@@ -1,3 +1,4 @@
+streamlit
 langgraph
 python-dotenv
 groq
